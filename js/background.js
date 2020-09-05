@@ -28,9 +28,11 @@ if (DEBUG) {
     browser.storage.sync.get((storedData) => {console.log(storedData)});
 }
 
+// TODO: Need an event handler for site access through links on whitelisted domains
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         if (typeof details.initiator === "undefined") {
+            // BUG:　extractDomain does not function correctly with URLs containing 2LD. Consider psl package for fix.
             let targetDomain = extractDomain(details.url);
             console.log("Requested access to domain: " + targetDomain);
 
