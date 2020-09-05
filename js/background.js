@@ -30,35 +30,42 @@ if (DEBUG) {
 
 browser.webRequest.onBeforeRequest.addListener(
     (details) => {
-        let targetDomain = extractDomain(details.url);
-        console.log("Requested access to domain: " + targetDomain);
+        if (typeof details.initiator === "undefined") {
+            let targetDomain = extractDomain(details.url);
+            console.log("Requested access to domain: " + targetDomain);
 
-        // Check if target is whitelisted, all the whitelisted domains are stored in 
-        browser.storage.sync.get(
-            (whitelist) => {
-                if (typeof whitelist[targetDomain] === "undefined") {
-                    console.log("Not whitelisted");
-                    // FIXME: Popup from newlyWhitelisted show up too quickly wait until user finishes typing in the omnibox and hit enter.
-                    // Right now it updates the tab but use {redirectUrl: details.url} when user whitelist the domain aka newlyWhitelisted returns true
-                    if (!newlyWhitelisted(targetDomain)) {
-                        // FIXME: Should return {cancel: true}.
-                        // Check webRequest.onBeforeRequest redirecting for details.
-                        // I wasn't able to figure out how to use the return value from callback namely newlywhitelisted().
-                        // If browser.storage.sync.get() can return an object instead of forcing to use callbacks this could be fixed.
-                        // BUG: Currently this will update the active tab instead of the tab where the request was initiated.
-                        // Get the tabID from details to fix this but this goes against the approach stated in FIXME above
-                        browser.tabs.update({url: "./blocking.html"});
+            // Check if target is whitelisted, all the whitelisted domains are stored in 
+            browser.storage.sync.get(
+                (whitelist) => {
+                    if (typeof whitelist[targetDomain] === "undefined") {
+                        console.log("Not whitelisted");
+                        // FIXME: Popup from newlyWhitelisted show up too quickly wait until user finishes typing in the omnibox and hit enter.
+                        // Right now it updates the tab but use {redirectUrl: details.url} when user whitelist the domain aka newlyWhitelisted returns true
+                        if (!newlyWhitelisted(targetDomain)) {
+                            // FIXME: Should return {cancel: true}.
+                            // Check webRequest.onBeforeRequest redirecting for details.
+                            // I wasn't able to figure out how to use the return value from callback namely newlywhitelisted().
+                            // If browser.storage.sync.get() can return an object instead of forcing to use callbacks this could be fixed.
+                            // BUG: Currently this will update the active tab instead of the tab where the request was initiated.
+                            // Get the tabID from details to fix this but this goes against the approach stated in FIXME above
+                            browser.tabs.update({ url: "./blocking.html" })
+                        }
+                        else {
+                            browser.tabs.update({ url: details.url });
+                        }
                     }
                     else {
-                        browser.tabs.update({url: details.url});
+                        console.log("Domain whitelisted");
+                        return;
                     }
                 }
-                else {
-                    console.log("Domain whitelisted");
-                    return;
-                }
+            );
+        }
+        else {
+            if (DEBUG) {
+                console.log("Invoked")
             }
-        );
+        }
     },
     FILTER,
     ["blocking"]
