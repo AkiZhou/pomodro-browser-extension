@@ -1,3 +1,8 @@
+/***** Enforcing extension API to be cross-browser ******/
+window.browser = (() => { return window.browser || window.chrome })();
+
+
+/***** Function definitions *****/
 function whitelisted(url) {
     // TODO: Check against whitelisted websites from storage
     console.log("Validating requested URL: " + url);
@@ -10,7 +15,12 @@ function newlyWhitelisted(url) {
     return true;
 }
 
-chrome.webRequest.onBeforeRequest.addListener(
+
+/***** Main *****/
+const DEBUG = false;
+const FILTER = { urls: ["<all_urls>"] };
+
+browser.webRequest.onBeforeRequest.addListener(
     (details) => {
         let requestedUrl = details.url;
         console.log(requestedUrl);
@@ -23,6 +33,6 @@ chrome.webRequest.onBeforeRequest.addListener(
             }
         }
     },
-    {urls: ["<all_urls>"]},
+    FILTER,
     ["blocking"]
 );
