@@ -2,7 +2,7 @@
     "manifest_version": 2,
     "name": "Pomodoro Timer & Web blocker",
     "version": "0.1.0",
-    "author": "",
+    "author": "Aki Zhou, ",
     "description": "Pomodoro timer that blocks selected websites for more focused environment",
 
     "browser_action": {
@@ -12,11 +12,16 @@
 
     "background": {
         "scripts": [
-            "./js/background.js"
+            "./js/background.js",
+            "./js/extract-domain.min.js"
         ],
-        "persistent": false
+        "persistent": true
     },
 
     "permissions": [
+        "<all_urls>",
+        "webRequest",
+        "webRequestBlocking",
+        "storage"
     ]
 }
