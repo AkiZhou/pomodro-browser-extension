@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Pomodro browser Extension Settings</title>
+</head>
+
+<body>
+
+    <form>
+        <label for="webID">website URL:</label>
+        <input type="text" id="webID" name="webID">
+
+        <br>
+        <div id="status"></div>
+        
+        <button onclick="save_settings()" type="submit" value="Submit">Save</button>
+        <button onclick="retrieve_settings()" type="submit" value="Submit">print</button>
+    </form>
+    <h1>Website list:</h1><br>
+    <ul id="webList"></ul>
+    <script src="settings.js"></script>
+
+</body>
+
+</html>
