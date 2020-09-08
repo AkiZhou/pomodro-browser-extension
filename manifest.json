@@ -13,7 +13,7 @@
     "background": {
         "scripts": [
             "./js/background.js",
-            "./js/extract-domain.min.js"
+            "./js/psl.min.js"
         ],
         "persistent": true
     },

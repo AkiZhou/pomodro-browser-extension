@@ -3,6 +3,13 @@ window.browser = (() => { return window.browser || window.chrome })();
 
 
 /***** Function definitions *****/
+function extractDomain(url) {
+    let origin = url.slice(url.search(':')+3);
+    let hostname = origin.slice(0, origin.search('/'));
+    let parsed = psl.parse(hostname);
+    return parsed.domain;
+}
+
 function newlyWhitelisted(domain) {
     let message = domain + " is not whitelisted.\nWould you like to have access to the domain?";
     if (window.confirm(message)) {
