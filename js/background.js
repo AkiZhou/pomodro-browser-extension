@@ -3,7 +3,7 @@ window.browser = (() => { return window.browser || window.chrome })();
 
 
 /***** Function definitions *****/
-function newlyWhitelisted(url) {
+function newlyWhitelisted(domain) {
     let message = domain + " is not whitelisted.\nWould you like to have access to the domain?";
     if (window.confirm(message)) {
         let key = domain;
@@ -20,11 +20,11 @@ function newlyWhitelisted(url) {
 
 
 /***** Main *****/
-const DEBUG = false;
+const DEBUG = true;
 const FILTER = { urls: ["<all_urls>"] };
 
 if (DEBUG) {
-    //browser.storage.sync.clear();
+    browser.storage.sync.clear();
     browser.storage.sync.get((storedData) => {console.log(storedData)});
 }
 
@@ -34,7 +34,8 @@ browser.webRequest.onBeforeRequest.addListener(
         if (typeof details.initiator === "undefined") {
             // BUG:　extractDomain does not function correctly with URLs containing 2LD. Consider psl package for fix.
             let targetDomain = extractDomain(details.url);
-            console.log("Requested access to domain: " + targetDomain);
+            let targetTab = details.tabId;
+            console.log("Requested access to domain: " + targetDomain + "\nOn tab: " + targetTab);
 
             // Check if target is whitelisted, all the whitelisted domains are stored in 
             browser.storage.sync.get(
@@ -44,16 +45,34 @@ browser.webRequest.onBeforeRequest.addListener(
                         // FIXME: Popup from newlyWhitelisted show up too quickly wait until user finishes typing in the omnibox and hit enter.
                         // Right now it updates the tab but use {redirectUrl: details.url} when user whitelist the domain aka newlyWhitelisted returns true
                         if (!newlyWhitelisted(targetDomain)) {
-                            // FIXME: Should return {cancel: true}.
-                            // Check webRequest.onBeforeRequest redirecting for details.
-                            // I wasn't able to figure out how to use the return value from callback namely newlywhitelisted().
-                            // If browser.storage.sync.get() can return an object instead of forcing to use callbacks this could be fixed.
-                            // BUG: Currently this will update the active tab instead of the tab where the request was initiated.
-                            // Get the tabID from details to fix this but this goes against the approach stated in FIXME above
-                            browser.tabs.update({ url: "./blocking.html" })
+                            // When browser prerender changes tab ID, subtract 1 from the old ID
+                            // FIXME: The browser console will show runtime error even with valid target ID when using newTargetTab. No problem to functionality so far but need to check.
+                            browser.tabs.get(targetTab,
+                                (result) => {
+                                    if (typeof result === "undefined") {
+                                        let newTargetTab = targetTab - 1;
+                                        console.log("Id-1 @", newTargetTab);
+                                        browser.tabs.update(newTargetTab, { url: "./blocking.html" });
+                                    }
+                                    else {
+                                        browser.tabs.update(targetTab, { url: "./blocking.html" });
+                                    }
+                                }
+                            )
                         }
                         else {
-                            browser.tabs.update({ url: details.url });
+                            browser.tabs.get(targetTab,
+                                (result) => {
+                                    if (typeof result === "undefined") {
+                                        let newTargetTab = targetTab - 1;
+                                        console.log("Id-1 @", newTargetTab);
+                                        browser.tabs.update(newTargetTab, { url: details.url });
+                                    }
+                                    else {
+                                        browser.tabs.update(targetTab, { url: details.url });
+                                    }
+                                }
+                            )
                         }
                     }
                     else {
