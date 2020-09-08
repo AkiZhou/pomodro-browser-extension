@@ -1,26 +1,29 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
-    <title>Pomodro browser Extension Settings</title>
+    <url>Pomodoro extension settings</url>
+    <style>
+        .formBox {
+            padding: 0.5rem 2rem;
+        }
+    </style>
 </head>
 
 <body>
-
     <form>
-        <label for="webID">website URL:</label>
-        <input type="text" id="webID" name="webID">
-
-        <br>
-        <div id="status"></div>
-        
-        <button onclick="save_settings()" type="submit" value="Submit">Save</button>
-        <button onclick="retrieve_settings()" type="submit" value="Submit">print</button>
+        <div class="formBox">
+            <label for="url">URL:</label>
+            <input type="text" id="url" placeholder="www.example.com" />
+        </div>
+        <div class="formBox">
+            <button id="btn">Click to Add</button>
+        </div>
+        <div id="msg">
+            <pre></pre>
+        </div>
     </form>
-    <h1>Website list:</h1><br>
-    <ul id="webList"></ul>
     <script src="settings.js"></script>
-
 </body>
 
 </html>

@@ -1,25 +1,23 @@
-// Saves options to chrome.storage
-let websites = [];
-function save_settings() {
-    event.preventDefault(); //need this to prevent site from reloading and erasing all data
-    var input = document.getElementById('webID').value;
-    document.getElementById('webList').innerHTML += '<li>' + input + '</li>';
-    websites.push(input);
-    // chrome.storage.sync.set(
-    //     { savedWebsites: websites },
-    //     function () { //update status to let user know options were saved
-    //         var status = document.getElementById('status');
-    //         status.textContent = 'Options saved';
-    //         setTimeout(function () { status.textContent = ''; }, 750);
-    //     }
-    // );
-    return websites;
-}
+let urls = [];
+// example {id:1592304983049, url: 'www.reddit.com'}
+const addURL = (ev) => {
+    ev.preventDefault();  //to stop the form submitting
+    let url = {
+        id: Date.now(),
+        url: document.getElementById('url').value,
+    }
+    urls.push(url);
+    document.forms[0].reset(); // to clear the form for the next entries
+    //document.querySelector('form').reset();
 
-function retrieve_settings(){
-    event.preventDefault();
-    console.log(websites.length)
-    websites.forEach(function (item, index, array) {
-        console.log(item)
-    })
+    //for display purposes only
+    console.warn('added', { urls });
+    let pre = document.querySelector('#msg pre');
+    pre.textContent = '\n' + JSON.stringify(urls, '\t', 2);
+
+    //saving to localStorage
+    localStorage.setItem('MyMovieList', JSON.stringify(urls));
 }
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('btn').addEventListener('click', addURL);
+});
