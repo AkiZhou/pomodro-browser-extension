@@ -16,7 +16,7 @@ const addURL = (ev) => {
     pre.textContent = '\n' + JSON.stringify(urls, '\t', 2);
 
     //saving to localStorage
-    localStorage.setItem('MyMovieList', JSON.stringify(urls));
+    localStorage.setItem('URL list', JSON.stringify(urls));
 }
 document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('btn').addEventListener('click', addURL);
